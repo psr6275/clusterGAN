@@ -192,8 +192,10 @@ class clusGAN(object):
         self.d = self.d_net(self.x, reuse=False) #discriminator output from true inputs.
         self.d_ = self.d_net(self.x_) #discriminator output from generated inputs.
 
-        self.g_loss = tf.reduce_mean(self.d_) + \ # reduce discriminator loss of generated inputs
-                      self.beta_cycle_gen * tf.reduce_mean(tf.square(self.z_gen - self.z_enc_gen)) + \ # reduce the difference between latent variables
+        # reduce discriminator loss of generated inputs
+        # reduce the difference between latent variables
+        self.g_loss = tf.reduce_mean(self.d_) + \
+                      self.beta_cycle_gen * tf.reduce_mean(tf.square(self.z_gen - self.z_enc_gen)) + \
                       self.beta_cycle_label * tf.reduce_mean(
             tf.nn.softmax_cross_entropy_with_logits(logits=self.z_enc_logits, labels=self.z_hot)) #reduce the loss between one hot intended and induced for generated inputs
 
@@ -211,7 +213,8 @@ class clusGAN(object):
 
         self.d_adam = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=0.5, beta2=0.9) \
             .minimize(self.d_loss, var_list=self.d_net.vars) # for discriminator the model should update discriminator
-        self.g_adam = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=0.5, beta2=0.9) \ # ignore the discriminator variable
+        # ignore the discriminator variable
+        self.g_adam = tf.train.AdamOptimizer(learning_rate=1e-4, beta1=0.5, beta2=0.9) \
             .minimize(self.g_loss, var_list=[self.g_net.vars, self.enc_net.vars]) #for generator we should train generator and encocder network
 
         # Reconstruction Nodes
